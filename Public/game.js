@@ -36,6 +36,17 @@ function setLineDash(list) {
     drawingContext.setLineDash(list);
 }
 function start(){
+    leftServes = boolean(Math.random()<0.5);
+    createCanvas(1600, 800);
+
+    controls = new Controls()
+
+    leftPlayer = new Paddle(60,height/2,1);
+
+    rightPlayer = new Paddle(width-60,height/2,0);
+
+    ball = new Ball();
+
     ball.x = width/2;
     ball.y = height/2;
 
@@ -58,22 +69,8 @@ function restart(){
     state = "wait";
     start();
 }
-function setup() {
-    leftServes = boolean(Math.random()<0.5);
-    createCanvas(1600, 800);
 
-    controls = new Controls()
-
-    leftPlayer = new Paddle(60,height/2,1);
-
-    rightPlayer = new Paddle(width-60,height/2,0);
-
-    ball = new Ball();
-    start();
-
-}
-
-function draw() {
+function drawGame() {
     switch (state) {
         case "play":
             PlayState();
