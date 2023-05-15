@@ -4,8 +4,8 @@ class Ball{
 
         this.x = width/2;
         this.y = height/2;
-        this.xSpeed = 0;
-        this.ySpeed = 0;
+        this.xSpeed = 100;
+        this.ySpeed = 100;
 
         this.multiplier = 1;
 
@@ -29,8 +29,8 @@ class Ball{
 
     Update(){
         this.x += this.xSpeed*delta;
-        this.y += this.ySpeed*delta;
 
+        this.y += this.ySpeed*delta;
         if(this.y<this.diameter/2){
             this.y = this.diameter/2;
             this.ySpeed *= -1;
@@ -38,22 +38,27 @@ class Ball{
             this.y = height-this.diameter/2;
             this.ySpeed *= -1;
         }
+
+        if(this.x<this.diameter/2){
+            this.x = this.diameter/2;
+            this.xSpeed *= -1;
+        }else if(this.x>width-this.diameter/2){
+            this.x = width-this.diameter/2;
+            this.xSpeed *= -1;
+        }
+
         this.positionHistory.push({x:this.x, y:this.y})
     }
 
     CheckScore(){
         if(ball.x<ball.diameter/2){
-            // this.x = this.diameter/2;
-            // this.xSpeed *= -1;
-            rightPlayer.points++;
+            rightPoints++;
             leftServes = false;
-            start();
+            // ResetGame();
         }else if(ball.x>width-ball.diameter/2){
-            // this.x = width-this.diameter/2;
-            // this.xSpeed *= -1;
-            leftPlayer.points++;
+            leftPoints++;
             leftServes = true;
-            start();
+            // ResetGame();
         }
     }
 
@@ -82,30 +87,6 @@ class Ball{
 
             this.xSpeed = -1 * ball.xSpeed - player.bounceAddForce;
         }
-        // } else {
-        //     // if(this.x<width/2 && this.xSpeed < 0){
-        //     //     this.touch = getIntersection(this.x, this.y, this.x - this.xSpeed*delta, this.y - this.ySpeed*delta, player.x+player.width/2, player.y-player.height/2, player.x+player.width/2, player.y+player.height/2);
-        //     //     if(this.touch!=null){
-        //     //         this.x = this.touch.x;
-        //     //         this.y = this.touch.y;
-        //     //         this.x = player.x + player.width/2 + this.diameter/2;
-        //     //         let difPos = (this.y - player.y) / (player.height/2);
-        //     //         this.ySpeed = this.ySpeed*player.bounceBallInfluence + difPos*player.bounceMultiply;
-        //     //         this.xSpeed = -1*ball.xSpeed+player.bounceAddForce;
-        //     //     }
-        //     // }else if(this.x>width/2 && this.xSpeed > 0){
-        //     //     this.touch = getIntersection(this.x, this.y, this.x - this.xSpeed*delta, this.y - this.ySpeed*delta, player.x-player.width/2, player.y-player.height/2, player.xplayer.width/2, player.y+player.height/2);
-        //     //     if(this.touch!=null){
-        //     //         this.x = this.touch.x;
-        //     //         this.y = this.touch.y;
-        //     //         this.x = player.x - player.width/2 - this.diameter/2;
-        //     //         let difPos = (this.y - player.y) / (player.height/2);
-        //     //         this.ySpeed = this.ySpeed*player.bounceBallInfluence + difPos*player.bounceMultiply;
-        //     //
-        //     //         this.xSpeed = -1*ball.xSpeed-player.bounceAddForce;
-        //     //     }
-        //     // }
-        // }
     }
 
 }

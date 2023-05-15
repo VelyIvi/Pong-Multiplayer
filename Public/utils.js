@@ -1,19 +1,24 @@
-// function getIntersection(Ax, Ay, Bx, By, Cx, Cy, Dx, Dy){
-//     const tTop=(Dx-Cx)*(Ay-Cy)-(Dy-Cy)*(Ax-Cx);
-//     const uTop=(Cy-Ay)*(Ax-Bx)-(Cx-Ax)*(Ay-By);
-//     const bottom=(Dy-Cy)*(Bx-Ax)-(Dx-Cx)*(By-Ay);
-//
-//     if (bottom!=0){
-//         const t=tTop/bottom;
-//         const u=uTop/bottom;
-//         if(t>=0 && t<=1 && u>=0 && u<=1){
-//             return {
-//                 x:lerp(Ax,Bx,t),
-//                 y:lerp(Ay,By,t),
-//                 offset:t
-//             }
-//         }
-//     }
-//
-//     return null;
-// }
+function whiteColor() {
+    if (arguments.length == 0) {
+        return color(235, 229, 206);
+    } else {
+        return color(235, 229, 206, arguments[0]);
+    }
+}
+
+function blackColor(alpha) {
+    if (arguments.length == 0) {
+        return color(23, 18, 25);
+    } else {
+        return color(23, 18, 25, arguments[0]);
+    }
+}
+
+let BUTTONSTYLE = {
+    color: "#ebe5ce", hover_color: "#f3efe2", pressed_color: "#fdfcfa",
+    text_color: "rgb(23, 18, 25)", border_color: "rgb(23, 18, 25)",
+    text_size: 40
+};
+function setLineDash(list) {
+    drawingContext.setLineDash(list);
+}
