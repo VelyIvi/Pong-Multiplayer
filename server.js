@@ -1,9 +1,10 @@
 class PlayerGame {
-    constructor(referee, player) {
+    constructor(referee, player, room) {
         this.referee = referee;
         this.player = player;
         this.scoreReferee = 0;
         this.scorePlayer = 0;
+        this.room = room;
     }
 }
 
@@ -16,8 +17,8 @@ app.use(express.static("Public"));
 
 console.log("Server is running");
 
-let connections = [];
 let waitingPlayers = [];
+let games = [];
 
 
 const socket = require("socket.io");
@@ -25,8 +26,26 @@ const io  = socket(server);
 
 io.sockets.on("connection", newConnection);
 
+
+function startGame(socket){
+
+    let y = Math.random();
+    if (y < 0.5) y = -1;
+    else y= 1;
+
+
+    let data = {
+        x: 800,
+        y: 400,
+        xSpeed: 400 * y,
+        ySpeed: 300 * (Math.random()*2-1),
+
+    }
+    socket.emit("ball", data);
+    socket.broadcast.emit("ball", data);
+
+}
 function newConnection(socket){
-    connections.push(socket)
     console.log("new connection: " + socket.id);
 
     socket.on("player", playerData);
@@ -35,30 +54,25 @@ function newConnection(socket){
 
     function playerData(data){
         socket.broadcast.emit("player", data);
-        // console.log(socket.id);
-        // console.log(data);
     }
 
     function ballData(data){
         socket.broadcast.emit("ball", data);
-        console.log(data);
     }
 
     function playerReady(data){
-        if(waitingPlayers.length>0){
-            console.log(waitingPlayers);
+        waitingPlayers.push(data);
+        if(waitingPlayers.length>=2){
 
-            socket.emit("play", {
+            socket.emit("getReady", {
                 referee: waitingPlayers.at(0),
                 play: true,
             });
-            socket.broadcast.emit("play", {
+            socket.broadcast.emit("getReady", {
                 referee: waitingPlayers.at(0),
                 play: true,
             });
-        } else {
-            waitingPlayers.push(data);
+            startGame(socket);
         }
     }
-
 }

@@ -11,8 +11,8 @@ let leftServes;
 let leftPoints = 0;
 let rightPoints = 0;
 
+
 function start(){
-    leftServes = boolean(Math.random()<0.5);
     createCanvas(1600, 800);
 
     controls = new Controls()
@@ -24,7 +24,7 @@ function start(){
     ball = new Ball();
     ball.x = width/2;
     ball.y = height/2;
-    ball.xSpeed = 100;
+    ball.xSpeed = 0;
     ball.ySpeed = 0;
     // ResetGame();
 }

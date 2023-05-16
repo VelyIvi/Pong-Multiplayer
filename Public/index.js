@@ -6,7 +6,7 @@ function setup() {
     socket.on("player", opponent);
     socket.on("ball", ballData);
 
-    socket.on("play", startMSG);
+    socket.on("getReady", readySignal);
 
 
     socket.emit("ready", socket.id);
@@ -16,18 +16,25 @@ function opponent(data){
     rightPlayer.y = data.y;
 }
 
-function startMSG(data){
+function readySignal(data){
     if(data.play) state = "play";
     else state = "wait";
-
+    leftServes = boolean(Math.random()<0.5);
     if(data.referee == socket.id) referee = true;
     console.log(data.referee);
 }
 function ballData(data){
-    ball.x = width-data.x;
-    ball.y = data.y;
-    ball.xSpeed = -data.xSpeed;
-    ball.ySpeed = data.ySpeed;
+    if(referee){
+        ball.x = data.x;
+        ball.y = data.y;
+        ball.xSpeed = data.xSpeed;
+        ball.ySpeed = data.ySpeed;
+    } else {
+        ball.x = width-data.x;
+        ball.y = data.y;
+        ball.xSpeed = -data.xSpeed;
+        ball.ySpeed = data.ySpeed;
+    }
 }
 
 function draw() {
