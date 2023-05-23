@@ -11,14 +11,14 @@ class PlayerGame {
 const express = require("express");
 
 const app = express();
-const server = app.listen(3000);
+const server = app.listen(process.env.PORT || 3000);
 
 app.use(express.static("Public"));
 
 console.log("Server is running");
 
 let waitingPlayers = [];
-let games = [];
+let clientRooms = [];
 
 
 const socket = require("socket.io");
@@ -45,12 +45,18 @@ function startGame(socket){
     socket.broadcast.emit("ball", data);
 
 }
+
+
 function newConnection(socket){
     console.log("new connection: " + socket.id);
 
     socket.on("player", playerData);
     socket.on("ball", ballData);
     socket.on("ready", playerReady);
+
+
+    socket.on("newGame", handleNewGame);
+    socket.on("joinGame", handleJoinGame);
 
     function playerData(data){
         socket.broadcast.emit("player", data);
@@ -74,5 +80,45 @@ function newConnection(socket){
             });
             startGame(socket);
         }
+    }
+
+    function handleNewGame(data){
+        let roomName = makeid(5);
+        clientRooms[socket.id] = roomName;
+        socket.emit('gameCode', roomName);
+
+        state[roomName] = "waiting";
+
+        socket.join(roomName);
+        socket.number = 1;
+        socket.emit('roomInit', 1);
+    }
+
+    function handleJoinGame(roomName){
+        const room = io.sockets.adapter.rooms[roomName];
+
+        let allUsers;
+        if (room) {
+            allUsers = room.sockets;
+        }
+
+        let numClients = 0;
+        if (allUsers) {
+            numClients = Object.keys(allUsers).length;
+        }
+
+        if (numClients == 0) {
+            socket.emit('unknownRoom');
+            return;
+        } else if (numClients > 2) {
+            socket.emit('roomFull');
+            return;
+        }
+
+        clientRooms[socket.id] = roomName;
+
+        socket.join(roomName);
+        socket.number = 2;
+        socket.emit('init', 2);
     }
 }
