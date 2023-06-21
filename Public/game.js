@@ -11,6 +11,7 @@ let leftServes;
 let leftPoints = 0;
 let rightPoints = 0;
 
+let state = "wait";
 
 function start(){
     createCanvas(1600, 800);
@@ -56,23 +57,53 @@ function WaitState(){
 }
 
 function PlayState(){
-    if (controls.leftUp || controls.rightUp){
-        leftPlayer.y -= leftPlayer.speed*delta;
 
-    }
-    if (controls.leftDown || controls.rightDown){
-        leftPlayer.y += leftPlayer.speed*delta;
-    }
+    if (gameType = "online") {
+        if (controls.leftUp || controls.rightUp) {
+            leftPlayer.y -= leftPlayer.speed * delta;
 
-    leftPlayer.CheckLimits();
+        }
+        if (controls.leftDown || controls.rightDown) {
+            leftPlayer.y += leftPlayer.speed * delta;
+        }
+        leftPlayer.CheckLimits();
+    } else if (gameType = "local") {
+        if (controls.leftUp) {
+            leftPlayer.y -= leftPlayer.speed * delta;
+
+        }
+        if (controls.leftDown) {
+            leftPlayer.y += leftPlayer.speed * delta;
+        }
+
+        if (controls.rightUp) {
+            rightPlayer.y -= rightPlayer.speed * delta;
+
+        }
+        if (controls.rightDown) {
+            rightPlayer.y += rightPlayer.speed * delta;
+        }
+
+        leftPlayer.CheckLimits();
+        rightPlayer.CheckLimits();
+
+    } else if (gameType = "ai") {
+        if (controls.leftUp || controls.rightUp) {
+            leftPlayer.y -= leftPlayer.speed * delta;
+
+        }
+        if (controls.leftDown || controls.rightDown) {
+            leftPlayer.y += leftPlayer.speed * delta;
+        }
+        leftPlayer.CheckLimits();
+        rightPlayer.CheckLimits();
+    }
+        // ball.CheckScore();
+
 
     ball.Update();
     ball.CheckCollision(leftPlayer);
     ball.CheckCollision(rightPlayer);
-
-
-    // ball.CheckScore();
-
 
     DrawGame();
 }

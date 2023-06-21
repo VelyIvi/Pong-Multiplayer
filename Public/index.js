@@ -1,6 +1,9 @@
 const socket = io("localhost:3000/");
 let referee = false;
-let state = "wait";
+
+let menuType = "none";
+let gameType = "none";
+
 function setup() {
     start();
     socket.on("player", opponent);
@@ -38,21 +41,27 @@ function ballData(data){
 }
 
 function draw() {
-    game();
+    if(menuType == "none" || menuType == "start") startMenu();
+    else if (menuType == "game"){
+        game();
+        if (gameType == "online"){
+            let playerData = {
+                x: leftPlayer.x,
+                y: leftPlayer.y,
+            }
+            let ballData = {
+                x: ball.x,
+                y: ball.y,
+                xSpeed: ball.xSpeed,
+                ySpeed: ball.ySpeed,
+            }
+            socket.emit("player", playerData);
 
-    let playerData = {
-        x: leftPlayer.x,
-        y: leftPlayer.y,
-    }
-    let ballData = {
-        x : ball.x,
-        y : ball.y,
-        xSpeed : ball.xSpeed,
-        ySpeed : ball.ySpeed,
-    }
-    socket.emit("player", playerData);
-
-    if(referee){
-        socket.emit("ball", ballData);
+            if (referee) {
+                socket.emit("ball", ballData);
+            }
+        }
     }
 }
+
+

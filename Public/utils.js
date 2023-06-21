@@ -6,7 +6,7 @@ function whiteColor() {
     }
 }
 
-function blackColor(alpha) {
+function blackColor() {
     if (arguments.length == 0) {
         return color(23, 18, 25);
     } else {
