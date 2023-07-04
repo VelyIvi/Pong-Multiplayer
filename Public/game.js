@@ -167,7 +167,7 @@ function PlayState(){
                     right: rightPoints,
                 }
                 resetPlay();
-                socket.emit("ball", ballData);
+                // socket.emit("ball", ballData);
                 socket.emit("score", scoreUpdateData);
 
             }else if(ball.x>width-ball.diameter/2){
