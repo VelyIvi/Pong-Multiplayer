@@ -31,20 +31,13 @@ class Ball{
         this.x += this.xSpeed*delta;
 
         this.y += this.ySpeed*delta;
+
         if(this.y<this.diameter/2){
             this.y = this.diameter/2;
             this.ySpeed *= -1;
         }else if(this.y>height-this.diameter/2){
             this.y = height-this.diameter/2;
             this.ySpeed *= -1;
-        }
-
-        if(this.x<this.diameter/2){
-            this.x = this.diameter/2;
-            this.xSpeed *= -1;
-        }else if(this.x>width-this.diameter/2){
-            this.x = width-this.diameter/2;
-            this.xSpeed *= -1;
         }
 
         this.positionHistory.push({x:this.x, y:this.y})

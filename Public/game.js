@@ -6,12 +6,45 @@ let leftPlayer;
 
 let ball;
 
-let leftServes;
 
 let leftPoints = 0;
 let rightPoints = 0;
 
 let state = "wait";
+
+
+let leftServes = 1;
+
+function exitPlay(){
+    resetPlay();
+    state = "wait";
+    gameType = "none";
+    menuType = "none";
+}
+
+function startPlay(){
+    ball.x = width/2;
+    ball.y = height/2;
+
+    let y = Math.random();
+    if (y < 0.5) leftServes = -1;
+    else leftServes = 1;
+    ball.xSpeed = 400 * leftServes;
+    ball.ySpeed = 300 * (Math.random()*2-1);
+
+    leftPoints = 0;
+    rightPoints = 0;
+}
+
+function resetPlay(){
+    ball.x = width/2;
+    ball.y = height/2;
+
+
+    ball.xSpeed = 400 * leftServes;
+    ball.ySpeed = 300 * (Math.random()*2-1);
+    ball.positionHistory.length = 0;
+}
 
 function start(){
     createCanvas(1600, 800);
@@ -30,11 +63,19 @@ function start(){
     // ResetGame();
 }
 function game() {
-    delta = deltaTime*0.001;
-    if(state == "play"){
+    switch (state) {
+    case "play":
+        delta = deltaTime*0.001;
         PlayState();
-    } else if (state == "wait"){
+        break;
+    case "wait":
         WaitState();
+        break;
+    case "pause":
+        PausedState();
+        break;
+    default:
+        console.log(`Error in state.`);
     }
 }
 function WaitState(){
@@ -43,31 +84,107 @@ function WaitState(){
     stroke(whiteColor());
     noFill();
     setLineDash([0]);
-    // line(ball.x, ball.y, ball.x+ball.xSpeed, ball.y+ball.ySpeed);
 
 
     background(blackColor(150));
-
     fill(whiteColor());
     textAlign(CENTER, CENTER);
     textSize(60);
-    text("Waiting for second player.", width/2, height/2);
+
+    if (gameType == "online") {
+        textSize(30);
+        text("Gamecode: " + gameConnectionCode, width / 2, 200);
+
+        textSize(60);
+        text("Waiting for second player.", width / 2, height / 2);
+    } else if (gameType == "local"){
+        text("Press enter to play", width/2, height/2);
+        line(ball.x, ball.y, ball.x+ball.xSpeed, ball.y+ball.ySpeed);
+        if(controls.enter){
+            state = "play";
+        }
+    }
+}
+
+let resumeGameButton;
+let exitGameButton;
+function PausedState(){
+    resumeGameButton = {x: width/2, y: 400-30, w:300, h: 50,
+        origin_x:0.5, origin_y:0.5,
+        text:"Resume", style:BUTTONSTYLE
+    };
+    exitGameButton = {x: width/2, y: 400+30, w:300, h: 50,
+        origin_x:0.5, origin_y:0.5,
+        text:"Exit", style:BUTTONSTYLE
+    };
+
+    if (gameType == "online") {
+        ball.Update();
+        ball.CheckCollision(leftPlayer);
+        ball.CheckCollision(rightPlayer)
+    }
+    DrawGame();
+
+    setLineDash([0]);
+    background(blackColor(150));
+    textSize(100);
+    textAlign(CENTER, CENTER);
+    text("Paused", width/2, 100);
+
+    button(resumeGameButton);
+    button(exitGameButton);
+
+    if(resumeGameButton.pressed || controls.escape){
+        controls.escape = false;
+        if(gameType == "local"){
+            state = "wait";
+        } else if (gameType == "online"){
+            state = "play";
+        }
+    } else if (exitGameButton.pressed){
+        exitPlay();
+    }
 
 
 }
 
 function PlayState(){
-
-    if (gameType = "online") {
+    if (gameType == "online") {
         if (controls.leftUp || controls.rightUp) {
             leftPlayer.y -= leftPlayer.speed * delta;
-
         }
         if (controls.leftDown || controls.rightDown) {
             leftPlayer.y += leftPlayer.speed * delta;
         }
         leftPlayer.CheckLimits();
-    } else if (gameType = "local") {
+
+        if(referee){
+            if(ball.x<ball.diameter/2){
+                leftServes = 1;
+                rightPoints++;
+                let scoreUpdateData = {
+                    left: leftPoints,
+                    right: rightPoints,
+                }
+                resetPlay();
+                socket.emit("ball", ballData);
+                socket.emit("score", scoreUpdateData);
+
+            }else if(ball.x>width-ball.diameter/2){
+                leftServes = -1;
+                leftPoints++;
+                let scoreUpdateData = {
+                    left: leftPoints,
+                    right: rightPoints
+                }
+                resetPlay();
+                // socket.emit("ball", ballData);
+                socket.emit("score", scoreUpdateData);
+
+            }
+        }
+
+    } else if (gameType == "local") {
         if (controls.leftUp) {
             leftPlayer.y -= leftPlayer.speed * delta;
 
@@ -87,7 +204,18 @@ function PlayState(){
         leftPlayer.CheckLimits();
         rightPlayer.CheckLimits();
 
-    } else if (gameType = "ai") {
+        if(ball.x<ball.diameter/2){
+            leftServes = 1;
+            rightPoints++;
+            resetPlay();
+        }else if(ball.x>width-ball.diameter/2){
+            leftServes = -1;
+            leftPoints++;
+            resetPlay();
+        }
+
+
+    } else if (gameType == "ai") {
         if (controls.leftUp || controls.rightUp) {
             leftPlayer.y -= leftPlayer.speed * delta;
 
@@ -106,6 +234,11 @@ function PlayState(){
     ball.CheckCollision(rightPlayer);
 
     DrawGame();
+
+    if(controls.escape) {
+        controls.escape = false;
+        state = "pause";
+    }
 }
 
 function DrawGame(){
