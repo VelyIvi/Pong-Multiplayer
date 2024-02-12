@@ -11,26 +11,32 @@ class Paddle{
         this.bounceMultiply = 400; //how much the angle of the ball changes after the bounce of the paddle.
         this.bounceBallInfluence = 0.3; //0.0f-1.0f range recomended. Influence of the current speed on the speed following the bounce.
         this.bounceYMultiply  = 0.1;
-
-        this.points = 0;
     }
     Draw(){
         rect(this.x-this.width/2, this.y-this.height/2, this.width, this.height);
     }
 
-    Update(up, down){
-        if(up){
-            this.y -= this.speed*delta;
-        } if (down){
-            this.y += this.speed*delta;
-        }
-
+    CheckLimits(){
         if (this.y < this.height/2){
             this.y = this.height/2;
         } else if (this.y > height-this.height/2){
             this.y = height-this.height/2;
         }
     }
+
+    // Update(up, down){
+    //     if(up){
+    //         this.y -= this.speed*delta;
+    //     } if (down){
+    //         this.y += this.speed*delta;
+    //     }
+    //
+    //     if (this.y < this.height/2){
+    //         this.y = this.height/2;
+    //     } else if (this.y > height-this.height/2){
+    //         this.y = height-this.height/2;
+    //     }
+    // }
     CheckCollision(circleX, circleY, circleRadius){
         let testX = circleX;
         let testY = circleY;
